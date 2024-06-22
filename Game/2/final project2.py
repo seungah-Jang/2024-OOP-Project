@@ -3,7 +3,7 @@ import random
 import time
 import os
 
-class b:
+class BombDefusalGame:
     def run(self):
         # Initialize pygame
         pygame.init()
@@ -46,16 +46,16 @@ class b:
 
         # Create screen
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Bomb Tracking Game")
+        pygame.display.set_caption("Bomb Defusal Game")
 
         # Load background image
-        os.chdir('/Users/hyeonjuyeon/Downloads/python/2')
+        os.chdir('/Users/hyeonjuyeon/Desktop/2024-OOP-Project/2024-OOP-project/Game/2')
         background = pygame.image.load('background2.png')
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
         # Load player image
         player_image = pygame.image.load('player.png')  # Replace 'player.png' with your image file
-        player_image = pygame.transform.scale(player_image, (CIRCLE_RADIUS * 2.1, CIRCLE_RADIUS * 2.1))
+        player_image = pygame.transform.scale(player_image, (CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2))
 
         # Load bomb image
         bomb_image = pygame.image.load('bomb.png')  # Replace 'bomb.png' with your image file
@@ -64,14 +64,11 @@ class b:
         # Player starting position
         player_pos = [ROWS - 1, COLS - 1]
 
-        # Forbidden positions
-        forbidden_positions = [(1, 1), (1,4), (4, 1), (4, 4)]
-
         # Bomb position
         def generate_bomb_position():
             while True:
                 pos = [random.randint(0, ROWS - 1), random.randint(0, COLS - 1)]
-                if pos not in forbidden_positions and pos != player_pos:
+                if pos != player_pos:
                     return pos
 
         bomb_pos = generate_bomb_position()
@@ -85,7 +82,7 @@ class b:
 
         # Function to draw grid
         def draw_grid():
-            pass  # Grid drawing code is not needed for this example
+            pass
 
         # Function to draw player
         def draw_player():
@@ -139,6 +136,7 @@ class b:
                 if player_pos == bomb_pos:
                     defused_bomb_count += 1
                     bomb_pos = generate_bomb_position()
+                    move_allowed = False  # Stop player movement until next word is typed correctly
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -155,14 +153,15 @@ class b:
                             elif event.key == pygame.K_RIGHT and player_pos[1] < COLS - 1:
                                 new_pos[1] += 1
                             
-                            if new_pos not in forbidden_positions:
+                            if new_pos != player_pos:
                                 player_pos = new_pos
-                                move_allowed = False
+                                move_allowed = False  # Require typing word again after each move
+
                         else:
                             if event.key == pygame.K_BACKSPACE:
                                 typed_word = typed_word[:-1]
                             elif event.key == pygame.K_RETURN:
-                                if typed_word == word:
+                                if typed_word.lower() == word.lower():
                                     move_allowed = True
                                     word = random.choice(words)
                                     typed_word = ""
@@ -171,11 +170,17 @@ class b:
                 
                 pygame.display.flip()
             
+            # Game over screen
+            screen.fill(WHITE)
+            game_over_surface = FONT.render("Game Over", True, BLACK)
+            screen.blit(game_over_surface, (WIDTH // 2 - game_over_surface.get_width() // 2, HEIGHT // 2 - game_over_surface.get_height() // 2))
+            pygame.display.flip()
+            pygame.time.wait(2000)
             pygame.quit()
-        
+            
         main()
 
-# Create an instance of class `b` and call the `run` method
+# Create an instance of class `BombDefusalGame` and call the `run` method
 if __name__ == "__main__":
-    game_instance = b()
+    game_instance = BombDefusalGame()
     game_instance.run()
