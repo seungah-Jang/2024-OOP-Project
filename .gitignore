@@ -1,0 +1,8 @@
+.env
+
+font/
+prac/
+data/
+
+__pycache__
+.DS_Store
