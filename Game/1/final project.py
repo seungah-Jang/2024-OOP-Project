@@ -74,12 +74,12 @@ class a:
         game_over = False
         timer_start = time.time()
         TIMER_DURATION = 30  # seconds for the bomb timer
-        computer_level = 3  # Computer level (1: easy, 2: medium, 3: hard)
+        computer_level = 3 # Computer level (1: easy, 2: medium, 3: hard)
         player_input_box = pygame.Rect(100, SCREEN_HEIGHT - 260, 140, 32)
         computer_input_box = pygame.Rect(SCREEN_WIDTH - 230, SCREEN_HEIGHT - 260, 140, 32)
         next_word_time = None  # To track the time when the word changes
 
-        def computer_typing_simulation(frames_per_char=0.05):
+        def computer_typing_simulation(frames_per_char=0.01):
             nonlocal computer_input_text, computer_score, current_word, player_input_text, next_word_time
             
             if next_word_time is None or time.time() - next_word_time > 1:  # Add delay between words
@@ -100,7 +100,7 @@ class a:
         def set_difficulty(level):
             global frames_per_char
             if level == 1:
-                frames_per_char = 0.1  # Easy: 1 char per 50 frames
+                frames_per_char = 0.001  # Easy: 1 char per 50 frames
             elif level == 2:
                 frames_per_char = 0.05  # Medium: 1 char per 20 frames
             elif level == 3:
