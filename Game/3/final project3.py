@@ -1,4 +1,3 @@
-
 import pygame
 import random
 import time
@@ -62,39 +61,49 @@ class c:
         active_box = input_box1  # Start with input_box1 as active
 
         def check_code(front, back):
-            global current_step
             expected_code = code_front[current_step].strip() + code_back[current_step].strip()
             user_code = front.strip() + back.strip()
             return expected_code == user_code
 
-        def display_cut():
+        def display_cut_image():
             screen.blit(cut, (0, 0))
             pygame.display.flip()
             pygame.time.wait(1000)
 
         # Main game loop
-        while not game_over:
+        running = True
+        while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    game_over = True
+                    running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if input_box1.collidepoint(event.pos):
                         active_box = input_box1
                     elif input_box2.collidepoint(event.pos):
                         active_box = input_box2
+                    else:
+                        active_box = None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if check_code(player_input_text1, player_input_text2):
-                            player_score += 1
-                            current_step += 1
-                            if current_step >= len(code_front):
-                                current_step = 0
-                                shuffled_indices, shuffled_code_back = create_shuffled_code_lists()
-                            player_input_text1 = ""
-                            player_input_text2 = ""
-                            display_cut()
-                        else:
-                            game_over = True
+                        if active_box == input_box1:
+                            active_box = input_box2
+                        elif active_box == input_box2:
+                            if check_code(player_input_text1, player_input_text2):
+                                display_cut_image()
+                                player_score += 1
+                                current_step += 1
+                                if current_step == 4:
+                                    player_input_text1 = ""
+                                    player_input_text2 = ""
+                                    current_step = 0
+                                    shuffled_indices, shuffled_code_back = create_shuffled_code_lists()
+                                else:
+                                    player_input_text1 = ""
+                                    player_input_text2 = ""
+                                    active_box = input_box1
+                            else:
+                                game_over = True
+                                break  # Break the event loop to display Game Over
                     elif event.key == pygame.K_BACKSPACE:
                         if active_box == input_box1:
                             player_input_text1 = player_input_text1[:-1]
@@ -131,6 +140,7 @@ class c:
             pygame.draw.rect(screen, BLACK, input_box1, 2)
             pygame.draw.rect(screen, BLACK, input_box2, 2)
 
+            
             # Draw scores
             player_score_surface = small_font.render(f"{player_score}", True, BLACK)
             screen.blit(player_score_surface, (415, 365))
@@ -147,6 +157,7 @@ class c:
 
             pygame.display.flip()
 
+
         # Game over screen
         if game_over:
             screen.fill(WHITE)
@@ -156,7 +167,6 @@ class c:
             pygame.time.wait(3000)
 
         pygame.quit()
-
 # Create an instance of class `c` and call the `run` method
 if __name__ == "__main__":
     game_instance = c()
