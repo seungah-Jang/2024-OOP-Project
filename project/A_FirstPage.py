@@ -3,12 +3,8 @@ import pygame
 import sys
 import os
 import time
-from A_Grammer import *
 from B_Program import *
 from C_Game import * 
-from D_Analysis import * 
-from E_Setting import *
-from F_Exit import *
 from Parent import *
 
 black = 20, 20, 40

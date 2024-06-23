@@ -1,28 +1,17 @@
 import pygame
 from Parent import *
 import os
-class Setting(Screen):
-    def draw(self):
-        self.screen.fill(WHITE)
-        draw_text('Start Setting', font, BLACK, self.screen, 400, 300)
-        pygame.display.update()
-
-
-import pygame
 import sys
-import os
 import Parent
+
+
+
+stars_istance = Stars()
+
 
 def save_selection(selection):
     with open('selection.txt', 'w') as file:
         file.write(selection)
-
-pygame.init()
-
-# 화면 크기 설정
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption('캐릭터 선택')
-
 
 
 current_dir = os.path.dirname(__file__)
@@ -37,17 +26,30 @@ pygame.display.set_caption('캐릭터 선택')
 # 캐릭터 이미지 로드 및 크기 조정
 character1 = pygame.image.load(ch1_dir)
 character2 = pygame.image.load(ch2_dir)
-character1 = pygame.transform.scale(character1, (100, 100))  # 이미지 크기 조정
-character2 = pygame.transform.scale(character2, (100, 100))  # 이미지 크기 조정
+character1 = pygame.transform.scale(character1, (200, 200))  # 이미지 크기 조정
+character2 = pygame.transform.scale(character2, (200, 200))  # 이미지 크기 조정
 
 # 위치 설정
 character1_rect = character1.get_rect(center=(200, 300))
 character2_rect = character2.get_rect(center=(600, 300))
 
+# 배경 이미지 로드
+back_dir = os.path.join(current_dir,'data','background.gif')
+background_image = pygame.image.load(back_dir)
+background_image = pygame.transform.scale(background_image, (850, 900))
+
+
+class Setting(Screen):
+    def draw(self):
+        self.screen.fill(BLACK)
+        draw_text('Start Setting', font, BLACK, self.screen, 400, 300)
+        pygame.display.update()
+
 class D_Play:
     def run(self):
         selected_character = None
         running = True
+        stars = stars_istance.initialize_stars()
 
         while running:
             for event in pygame.event.get():
@@ -64,7 +66,7 @@ class D_Play:
                         save_selection('character2.png')
             #print(selected_character)
             screen.fill((255, 255, 255))
-            
+            screen.blit(background_image, (0, 0))
             # 캐릭터 이미지를 화면에 그리기
             screen.blit(character1, character1_rect)
             screen.blit(character2, character2_rect)

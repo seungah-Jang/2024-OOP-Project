@@ -2,7 +2,6 @@ import pygame
 from Parent import *
 import sys
 from datetime import datetime
-#import db
 import time
 import string
 from openai import OpenAI
@@ -11,10 +10,6 @@ import Parent
 
 client = OpenAI()
 current_dir = os.path.dirname(__file__)
-# 선택한 캐릭터 이미지 불러오기
-
-
-
 
 # 데이터베이스 연결
 #conn = db.create_connection()
@@ -24,18 +19,18 @@ def generate_code():
     res = client.completions.create (
         model="gpt-3.5-turbo-instruct",
         prompt=
-        "Generate between 10 and 15 lines of Python code. Each line should not exceed 40 characters. The concept of the program should be related to space and aliens, so use space-related variable names. Generate code using different Python syntaxes. Provide different code each time. Do not include code numbers or comments. Provide only the code in your response.",
-        temperature = 0,
+        "Generate between 10 and 15 lines of Python code. Each line of code must not exceed 30 characters . The concept of the program should be related to space and aliens, so use space-related variable names. Generate code using different Python syntaxes. Do not include code numbers or comments. Provide only the code in your response.",
+        temperature = 0.25,
         max_tokens =500
     )
     return res.choices[0].text
 
+# load image
 def load_selection():
     try:
         with open('selection.txt', 'r') as file:
             selection = file.read().strip()
             return os.path.join(current_dir, 'data', selection)
-            #return pygame.image.load(os.path.join(current_dir, 'data', selection))
     except FileNotFoundError:
         return None
 
@@ -44,10 +39,6 @@ class Program(Screen):
         self.screen.fill(WHITE)
         draw_text('Start Program practice', font, BLACK, self.screen, 400, 300)
         pygame.display.update()
-# TB_SESSION_RESULT
-## (session_start_time,total_keystrokes,correct_cnt,elapsed_time,accuracy,wpm)
-# TB_KEY
-## (session_id,key_value,total_keyvalue,correct_keyvalue,incorrect_keyvalue)
 
 
 class B_Play:
@@ -55,42 +46,25 @@ class B_Play:
         self.correct_cnt = 0
         self.correct_ll = []
         self.sound_trace = False
-
-    def make_key_dic(self):
-        # 대문자, 소문자, 숫자 가져오기
-        uppercase_letters = string.ascii_uppercase
-        lowercase_letters = string.ascii_lowercase
-        digits = string.digits
-        special_characters = string.punctuation
-
-        # 모든 문자들을 합치기
-        all_characters = uppercase_letters + lowercase_letters + digits + special_characters
-
-        # 딕셔너리를 생성하고 초기값을 0으로 설정
-        key_values_dic = {char: 0 for char in all_characters}
-
-        return key_values_dic
     
+    # 타이핑 시, 텍스트 색상 처리
     def checkcolor(self,input_len,sentence_ll,current_char,color_text,correct_cnt):
         # text 의 color (같으면 검은색0, 틀리면 빨간색2, 미완이면 회색1)
         if input_len <= len(sentence_ll):
             if current_char == sentence_ll[input_len-1]: #같으면 검은색 (0)
                 color_text[input_len-1] = 0
-                self.correct_cnt += 1
-                
+                self.correct_cnt += 1 
             else:
                 color_text[input_len-1] = 2
                 self.correct_ll[input_len-1] = 0
 
     def run(self):
         # 변수 초기화
-    
-        #correct_cnt = 0
+        current_dir = os.path.dirname(__file__)
+
         current = datetime.now()
-        session_start_time = current.strftime("%Y-%m-%d %H:%M:%S")
         sTime = time.time() 
-        total_keystrokes = 0
-        key_values_dic = self.make_key_dic()
+ 
         # 초기화
         pygame.init()
 
@@ -110,44 +84,16 @@ class B_Play:
 
         # 폰트 설정
         font_size = 26
-        # 폰트 설정
         #font = pygame.font.Font(None, 26)
-
         font_path = os.path.join(os.path.dirname(__file__), '..', 'font', 'DungGeunMo.ttf')
         font = pygame.font.Font(font_path, 26)
 
         # 배경 이미지 로드
-        
-        current_dir = os.path.dirname(__file__)
-
         back_dir = os.path.join(current_dir,'data','background.gif')
         background_image = pygame.image.load(back_dir)
         background_image = pygame.transform.scale(background_image, (850, 900))
-        
-        
-        #font_path = os.path.join(os.path.dirname(__file__), "NANUMGOTHIC.TTF")
-        #font = pygame.font.Font(font_path, 20)
 
         # 연습할 문장
-        '''
-        sentence = [
-            "dic = {'STRAWBERRY':0,'BANANA':0,'LIME':0,'PLUM':0}",
-            "N = int(input())",
-            "for i in range(N):",
-            "   fruit,num = input().split()",
-            "   dic[fruit] += int(num)",
-            "check=0",
-            "for key,value in dic.items():",
-            "   if value==5:",
-            "       check=1",
-            "       break",
-            "if check==1:",
-            "   print(\"YES\")",
-            "else:",
-            "   print(\"NO\")",
-
-
-        ]'''
         '''
         sentence = """dic = {'STRAWBERRY':0,'BANANA':0,'LIME':0,'PLUM':0}
         N = int(input())
@@ -166,7 +112,6 @@ class B_Play:
         '''
         sentence = generate_code()
         sentence_ll = list(sentence)
-        #sentence_ll = [char for char in sentence if char != ' ']
         print(sentence_ll)
         typed_text = ""
         start_time = None
@@ -177,6 +122,7 @@ class B_Play:
         blink = True
         blink_time = 0
         finished = False
+
         # 메인 루프
         running = True
         while running:
@@ -189,20 +135,15 @@ class B_Play:
                         running = False
                     elif event.key == pygame.K_BACKSPACE:
                         idx = len(typed_text)-1
-                        #print(idx,typed_text[idx],color_text[idx])
                         color_text[idx] = 1
-                        #print(color_text[idx])
                         typed_text = typed_text[:-1]
                         self.correct_cnt -= 1
                         self.correct_ll[idx] = 1
-                        #print(self.correct_ll[idx-1])
-                        #self.checkcolor(input_len,sentence_ll,current_char,color_text,correct_cnt)
                     elif event.key == pygame.K_RETURN:
                         if len(typed_text) < len(sentence_ll):
                             if sentence_ll[len(typed_text)]=='\n':
                                 self.correct_cnt += 1
                                 typed_text += '\n'
-
                     elif event.key == pygame.K_TAB:
                         typed_text += '\t'
                     elif event.key == pygame.K_SPACE:
@@ -213,10 +154,10 @@ class B_Play:
                             else:
                                 self.correct_cnt += 1
                                 typed_text += ' '
-
                     elif event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
                         pass
-                    else: #한줄 끝났을 때, 엔터를 누르지 않으면 해당 글자가 거기서 멈추거고 커서가 넘어가지 않도록 처리해야함.
+                    #한줄 끝났을 때, 엔터를 누르지 않으면 해당 글자가 거기서 멈추거고 커서가 넘어가지 않도록 처리해야함.
+                    else: 
                         if sentence_ll[len(typed_text)] == '\n':
                             continue
                         # 공백인데 다른 키를 누르면 넘어가지 않도록 처리해야함.
@@ -231,38 +172,21 @@ class B_Play:
                             input_len = len(typed_text)
                             #남은 텍스트
                             remaining_text = sentence_ll[input_len:]
-                            #print(input_len,len(sentence))
-                            
-                            #     def checkcolor(self,input_len,sentence_ll,current_char,color_text,correct_cnt):
-                            self.checkcolor(input_len,sentence_ll,current_char,color_text,self.correct_cnt)
                             # text 의 color (같으면 검은색0, 틀리면 빨간색2, 미완이면 회색1)
-                            '''
-                            if input_len <= len(sentence_ll):
-                                if current_char == sentence_ll[input_len-1]: #같으면 검은색 (0)
-                                    color_text[input_len-1] = 0
-                                    correct_cnt += 1
-                                else:
-                                    color_text[input_len-1] = 2
-                            '''
+                            self.checkcolor(input_len,sentence_ll,current_char,color_text,self.correct_cnt)
 
             tmp_total_keystrokes = len(typed_text)
             tmp_correct_cnt = self.correct_cnt
             tmp_elapsed_time = (time.time()-sTime)/60
 
-            #real_accuracy = (tmp_correct_cnt/len(typed_text))* 100
-            #print("real accuracy",tmp_correct_cnt,len(sentence_ll))
-            
+
             if len(typed_text)==0:
                 real_accuracy = 100
             else:
-                #real_accuracy = (tmp_correct_cnt / max(tmp_total_keystrokes, 1)) * 100
-                #real_accuracy = (tmp_correct_cnt/len(typed_text))* 100
                 real_accuracy = (sum(self.correct_ll)/len(sentence_ll))*100
-            #print("real accuracy",self.correct_ll)
 
             real_wpm = (tmp_total_keystrokes/5)/tmp_elapsed_time
             
-            #print("accuracy",real_accuracy)
             # 하단 좌측에 출력할 텍스트 좌표
             left_bottom_x = 20
             left_bottom_y = screen.get_height() - 40  
@@ -303,15 +227,6 @@ class B_Play:
                 selected_character_scaled = pygame.transform.scale(selected_character, (150, 150))
                 screen.blit(selected_character_scaled, (650, 50))
                 
-
-            '''
-            if selected_character:
-                if real_accuracy <= 60:
-                    base_name, ext = os.path.splitext(selected_character)
-                    selected_character = f"{base_name}cry{ext}"
-                selected_character_scaled = pygame.transform.scale(selected_character, (150, 150))  # 이미지 크기 조정
-                screen.blit(selected_character_scaled, (650, 50))  # 상단 우측에 이미지 표시
-            '''
             # 화면 그리기
             #screen.fill(WHITE)sd
             # Real Accuracy 텍스트 생성
@@ -329,10 +244,6 @@ class B_Play:
             y_offset = 50
             char_width = 12
             line_height = font_size + 10 
-
-            
-            #correct_surface = font.render(sentence, True, BLACK)
-            #screen.blit(correct_surface, (50, 50))
 
             for i in range(len(sentence)):
                 if sentence[i] == "\n":
@@ -376,9 +287,6 @@ class B_Play:
                             cursor_x = 50
                             cursor_y += line_height
                         j += 1
-                        
-
-                    
                     else: # 공백인데 다른 키를 누르면 커서 넘어가지 않도록 처리해야함./ 해당 줄의 마지막에 엔터인데 다른키를 누르면 움직이지 않도록 해야함.
                         if sentence_ll[j] == '\n':
                             j+=1
@@ -389,9 +297,7 @@ class B_Play:
                                 cursor_x = 50
                                 cursor_y += line_height
                             j += 1
-                            
-                    
-
+            
                 pygame.draw.rect(screen, BLUE, (cursor_x, cursor_y, 2, font_size))
                 if len(typed_text) == len(sentence):
                     total_keystrokes = len(typed_text)
@@ -409,13 +315,6 @@ class B_Play:
                     running = False  # 프로그램 종료
             # 화면 업데이트
             pygame.display.flip()
-        '''
-        elapsed_time = (time.time() - sTime)/60
-        accuracy = (correct_cnt/total_keystrokes)*100
-        wpm = (total_keystrokes/5)/elapsed_time
-        print(session_start_time, total_keystrokes, correct_cnt,elapsed_time,accuracy,wpm)
-        ## DB에 insert 할것.
-        '''
 
         return "main_screen"
         # 종료

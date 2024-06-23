@@ -2,9 +2,18 @@ import pygame
 import random
 import time
 import os
+from Parent import *
+
+current_dir = os.path.dirname(__file__)
+
+class Game1_Screen(Screen):
+    def draw(self):
+        self.screen.fill(WHITE)
+        draw_text('Start Setting', font, BLACK, self.screen, 400, 300)
+        pygame.display.update()
 
 
-class a:
+class Game1_Play:
     def __init__(self):
         # Initialize pygame
         pygame.init()
@@ -23,18 +32,20 @@ class a:
         pygame.display.set_caption("Typing Game")
 
         # Load background image
-        os.chdir('/Users/hyeonjuyeon/Downloads/python/1')
-        self.background = pygame.image.load('Game1_background.png')
+        Game1_back_dir = os.path.join(current_dir,'data','Game1_background.png')
+        self.background = pygame.image.load(Game1_back_dir)
         self.background = pygame.transform.scale(self.background, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         # Bomb image
-        self.bomb = pygame.image.load('Game1_bomb.png')
+        Game1_bomb_dir = os.path.join(current_dir,'data','Game1_bomb.png')
+        self.bomb = pygame.image.load(Game1_bomb_dir)
         self.bomb_size = self.bomb.get_rect().size
         self.bomb_width = self.bomb_size[0]
         self.bomb_height = self.bomb_size[1]
 
         # Bomb2 image
-        self.bomb2 = pygame.image.load('Game1_bomb2.png')
+        Game1_bomb2_dir = os.path.join(current_dir,'data','Game1_bomb2.png')
+        self.bomb2 = pygame.image.load(Game1_bomb2_dir)
         self.bomb2 = pygame.transform.scale(self.bomb2, (int(self.bomb2.get_width() * 0.8), int(self.bomb2.get_height() * 0.8)))
         self.bomb2_size = self.bomb.get_rect().size
         self.bomb2_width = self.bomb2_size[0]
@@ -185,7 +196,8 @@ class a:
                 if int(remaining_time * 5) % 2 == 0:  # Blinks every half second
                     self.screen.blit(self.bomb, (bomb_x_pos, bomb_y_pos))
                 else:
-                    blink = pygame.image.load('Game1_blink.jpeg')
+                    Game1_blink_dir = os.path.join(current_dir,'data','Game1_blink.jpeg')
+                    blink = pygame.image.load(Game1_blink_dir)
                     self.screen.blit(blink, (bomb_x_pos, bomb_y_pos))
 
             if remaining_time <= 0:
@@ -206,11 +218,14 @@ class a:
         # Game over screen2
         self.screen.fill(self.WHITE)
         game_over_surface = self.font.render("Game Over", True, self.BLACK)
+        
         self.screen.blit(game_over_surface, (self.SCREEN_WIDTH // 2 - game_over_surface.get_width() // 2, self.SCREEN_HEIGHT // 2 - game_over_surface.get_height() // 2))
+        
+
         pygame.display.flip()
         pygame.time.wait(1000)
-
-        pygame.quit()
+        return "Game_main_screen"
+        #pygame.quit()
 if __name__ == "__main__":
-    game_instance = a()
+    game_instance = Game1_Play()
     game_instance.run() 

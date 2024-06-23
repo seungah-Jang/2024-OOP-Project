@@ -1,51 +1,99 @@
+from Parent import *
 import pygame
 import sys
-from B_Program import *
-from C_Game import * 
-from D_Setting import *
-from F_Exit import *
-from Parent import *
-#import db
+import os
 import time
-import random
-import math
+from B_Program import *
+from C_Game import *  
+from D_Setting import *
+from Parent import *
 
-# 데이터베이스 연결
-#conn = db.create_connection()
+class Text_process:
+    # 텍스트를 한 줄씩 그리는 함수
+    def line_draw_text(self,screen, text, position, color=WHITE):
+        text_surface = font.render(text, True, color)
+        screen.blit(text_surface, position)
 
-# 초기화
-pygame.init()
+    # 색상을 번갈아가면서 텍스트를 표시하는 함수
+    def draw_colored_text(self,screen, text, position, finished=False):
+        x, y = position
+        for i, char in enumerate(text):
+            if finished:
+                color = WHITE
+            else:
+                color = YELLOW if i % 2 == 0 else CYAN
+            char_surface = font.render(char, True, color)
+            screen.blit(char_surface, (x, y))
+            x += char_surface.get_width()
 
-# 화면 설정
-screen = pygame.display.set_mode((800, 900))
-pygame.display.set_caption("타자 연습 프로그램")
-# 색상 정의
-WHITE = (255, 255, 255)
+# color
 BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-black = 20, 20, 40
-white = 255, 240, 200
-#폰트
-font = pygame.font.Font(None, 36)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+CYAN = (0, 255, 255)
+
+#window size
+NUMSTARS = 150
+WINSIZE = [850,900]
+WINCENTER = [320,240]
+
+screen = pygame.display.set_mode(WINSIZE)
+pygame.display.set_caption("Code Typing Game")
+
+# font
+font_path = os.path.join(os.path.dirname(__file__), '..', 'font', 'DungGeunMo.ttf')
+font = pygame.font.Font(font_path, 21)
+
+current_dir = os.path.dirname(__file__)
+
+# instance
+stars_istance = Stars()
+texts_instance = Text_process()
+
+
+###### story ###########
+story = [
+    "코딩별에 사는 외계인은 파이썬을 무지 좋아해서 지구로 내려왔습니다.",
+    "문제는 성격이 너무 급해 타이핑이 느린 지구인을 굉장히 답답해합니다!",
+    "",
+    "당신은 코딩별로 납치되었습니다 ...",
+    "눈 떠 보니 외계인이 지구에서 폭탄을 들고 왔네요 !",
+    "놀랍게도 코딩별에 오니 외계인이랑 대화를 하고 있습니다.",
+    "",
+    "",
+    "외계인 왈..",
+    "",
+    "외 : 이게 뭐야?",
+    "지구인 : 건들지마 ...!! 터지면 죽어 !!!",
+    "외 : 그럼 우리가 만든 프로그램 미션 완수하면 살려줄게.",
+    "타이핑이 왜 이렇게 답답해? 우리별에선 너처럼 독수리타자는 없다구!",
+    "",
+    "컴퓨터 한 대와 폭탄을 넣고 가둬버렸습니다.",
+    "친절하게도 연습 시간은 주네요 !!",
+    "",
+    "연습시간이 완료되면 3가지 미션을 완수해보세요!!"
+]
+
+########## 배경음 ##########
+sound_dir = os.path.join(current_dir,'data','MainSound.wav')
+pygame.mixer.init()
+pygame.mixer.music.load(sound_dir)
+pygame.mixer.music.set_volume(0.5)  # 음량 설정 (0.0 ~ 1.0)
 
 
 
-class MainPage(Screen):
-    def __init__(self, screen):
+
+# screen 이름을 반환 / UI (버튼, text) / 버튼 마우스 클릭 동작
+class Main_Screen(Screen):
+    def __init__(self,screen):
         super().__init__(screen)
         self.button_rects = {
-            "1. Grammer Practice": pygame.Rect(300, 200, 200, 50),
-            "2. Program Practice": pygame.Rect(300, 300, 200, 50),
-            "3. Game": pygame.Rect(300, 400, 200, 50),
-            "4. Analysis": pygame.Rect(300, 500, 200, 50),
-            "5. Setting": pygame.Rect(300, 600, 200, 50),
-            "6. Exit": pygame.Rect(300, 700, 200, 50),
+            "Setting" : pygame.Rect(30, 810, 100, 50),
+            "Practice" : pygame.Rect(200, 810, 100, 50),
+            "Survive" : pygame.Rect(600, 810, 100, 50)
         }
-
+    # 버튼 text,버튼 배경 그리기
     def draw(self):
-        #self.screen.fill(black)
-        #draw_text('Coding Typing Program', font, BLACK, self.screen, 400, 100)
-        
         for button_text, rect in self.button_rects.items():
             pygame.draw.rect(self.screen, GRAY, rect)
             draw_text(button_text.replace('_', ' ').title(), font, BLACK, self.screen, rect.centerx, rect.centery)
@@ -59,66 +107,105 @@ class MainPage(Screen):
                     return screen_name
         return None
 
-class TypingProgram:
-    # 첫화면 진입 시 메인 화면
+
+
+
+class A_Play:
+    # screen 설정
     def __init__(self):
-        
         self.screen = screen
-        self.current_screen = MainPage(self.screen)
+        self.current_screen = Main_Screen(self.screen)
         self.screens = {
-            "main_screen" : MainPage(self.screen),
-            "1. Grammer Practice" : Grammer(self.screen),
-            "2. Program Practice" : Program(self.screen),
-            "3. Game" : Game(self.screen),
-            "4. Analysis" : Analysis(self.screen),
-            "5. Setting" : Setting(self.screen),
+            "main_screen" : Main_Screen(self.screen),
+            "Setting" : Setting(self.screen),
+            "Practice" : Program(self.screen),
+            "Survive" : Game(self.screen)
         }
-
-
-
     
-
     def run(self):
-        screen.fill(black)
-        clock = pygame.time.Clock()
-        class_Stars = Stars()
-        stars = class_Stars.initialize_stars()
-        while True:
-            for event in pygame.event.get():
-                class_Stars.draw_stars(screen,stars,black)
-                class_Stars.move_stars(stars)
-                class_Stars.draw_stars(screen,stars,white)
-                pygame.display.update()
-                # 창을 닫거나, esc 눌렀을 때 닫힘
-                if event.type == pygame.QUIT or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE):
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button==1:
-                    class_Stars.WINCENTER[:] = list(event.pos)
-                
-                # backspace 누르면 다시 메인화면으로!
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_BACKSPACE:
+        # initialize and prepare screen
+        pygame.init()
+        screen.fill(BLACK)
+        clock = pygame.time.Clock()
+
+        # 음성 재생
+        pygame.mixer.music.play(-1)
+
+        # create starfield
+        stars = stars_istance.initialize_stars()
+
+        # text
+        text_index = 0
+        letter_index = 0
+        show_time = 0.05  # 각 글자의 딜레이 (초)
+        last_update_time = time.time()
+
+        done = False
+        while not done:
+            screen.fill(BLACK)
+            current_time = time.time()
+            if current_time - last_update_time > show_time:
+                last_update_time = current_time
+                if text_index < len(story):
+                    if letter_index < len(story[text_index]):
+                        letter_index += 1 #다음 글자
+                    else:
+                        text_index += 1 # 다음 줄로
+                        letter_index = 0
+            # 완료된 한줄 텍스트 WHITE로
+            y = 50
+            for i in range(text_index):
+                texts_instance.line_draw_text(screen, story[i], (50, y))
+                y += 40
+            # 현재 표시 중인 텍스트
+            if text_index < len(story):
+                current_text = story[text_index][:letter_index]
+                texts_instance.draw_colored_text(screen, current_text, (50, y))
+            # 모든 줄 완료되면 모두 흰색으로
+            else:
+                for i in range(len(story)):
+                    texts_instance.draw_colored_text(screen, story[i], (50, 50 + 40 * i), finished=True)
+            
+            ###stars####
+            stars_istance.draw_stars(screen, stars, BLACK)
+            stars_istance.move_stars(stars)
+            stars_istance.draw_stars(screen, stars, WHITE)
+            
+            self.current_screen.draw()
+
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT or (e.type == pygame.KEYUP and e.key == pygame.K_ESCAPE):
+                    done = True
+                    break
+                if e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                    stars_istance.WINCENTER[:] = list(e.pos)
+                if e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_BACKSPACE:
                         self.current_screen = self.screens["main_screen"]
-                    
-                # 클릭한 스크린 이름 반환
-                screen_name = self.current_screen.handle_event(event)
-                #해당 스크린 클릭했을 때, 화면 전환
+
+                # 스크린 클릭 시 화면 전환
+                screen_name = self.current_screen.handle_event(e)
                 if screen_name:
                     self.current_screen = self.screens[screen_name]
-            
-                if self.current_screen == self.screens["2. Program Practice"]:
-                    
+
+                if self.current_screen == self.screens["Practice"]:
                     program_play = B_Play()
                     screen_name = program_play.run()
                     self.current_screen = self.screens[screen_name]
                 
-                else:
-                    self.current_screen.draw()
-                
-                #pygame.display.update()
+                if self.current_screen == self.screens["Setting"]:
+                    program_play = D_Play()
+                    screen_name = program_play.run()
+                    self.current_screen = self.screens[screen_name]
 
+                if self.current_screen == self.screens["Survive"] :
+                    program_play = C_Play()
+                    screen_name = program_play.run()
+                    self.current_screen = self.screens[screen_name]
+            clock.tick(50)
+        pygame.quit()
+    
 if __name__ == "__main__":
-    app = TypingProgram()
+    app = A_Play()
     app.run()

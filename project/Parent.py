@@ -16,9 +16,12 @@ font = pygame.font.Font(None, 36)
 
 class Stars:
     def __init__(self):
-        self.WINSIZE = [800, 900]
-        self.WINCENTER = [400, 450]
+        self.WINSIZE = [850,900]
+        self.WINCENTER = [320,240]
         self.NUMSTARS = 150
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
+        self.GRAY = (200, 200, 200)
 
     def init_star(self,steps=-1):
         "creates new star values"
@@ -57,16 +60,43 @@ class Stars:
                 vel[0] = vel[0] * 1.05
                 vel[1] = vel[1] * 1.05
 
+
+
 class Screen:
     def __init__(self, screen):
         self.screen = screen
         print("ss")
     
+    # screen에서 text  
     def draw(self):
         pass
 
     def handle_event(self, event):
         pass
+
+# screen 이름을 반환 / UI (버튼, text) / 버튼 마우스 클릭 동작
+class Main_Screen(Screen):
+    def __init__(self,screen):
+        super().__init__(screen)
+        self.button_rects = {
+            "Setting" : pygame.Rect(30, 810, 100, 50),
+            "Practice" : pygame.Rect(200, 810, 100, 50),
+            "Survive" : pygame.Rect(600, 810, 100, 50)
+        }
+    # 버튼 text,버튼 배경 그리기
+    def draw(self):
+        for button_text, rect in self.button_rects.items():
+            pygame.draw.rect(self.screen, GRAY, rect)
+            draw_text(button_text.replace('_', ' ').title(), font, BLACK, self.screen, rect.centerx, rect.centery)
+        
+        pygame.display.update()
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for screen_name, rect in self.button_rects.items():
+                if rect.collidepoint(event.pos):
+                    return screen_name
+        return None
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)

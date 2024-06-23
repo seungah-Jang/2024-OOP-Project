@@ -2,8 +2,18 @@ import pygame
 import random
 import time
 import os
+from Parent import *
 
-class TypingGame:
+current_dir = os.path.dirname(__file__)
+
+
+class Game3_Screen(Screen):
+    def draw(self):
+        self.screen.fill(WHITE)
+        draw_text('Start Setting', font, BLACK, self.screen, 400, 300)
+        pygame.display.update()
+
+class Game3_Play:
     def __init__(self):
         # Initialize pygame
         pygame.init()
@@ -22,12 +32,13 @@ class TypingGame:
         pygame.display.set_caption("Typing Game")
 
         # Load background image
-        os.chdir('/Users/hyeonjuyeon/Downloads/python/3')
-        self.background = pygame.image.load('Game3_background3.png')
+        Game3_back_dir = os.path.join(current_dir,'data','Game3_background3.png')
+        self.background = pygame.image.load(Game3_back_dir)
         self.background = pygame.transform.scale(self.background, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         # Cut image
-        self.cut = pygame.image.load('Game3_cut.png')
+        Game3_cut_dir = os.path.join(current_dir,'data','Game3_cut.png')
+        self.cut = pygame.image.load(Game3_cut_dir)
         self.cut = pygame.transform.scale(self.cut, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         # Font
@@ -169,9 +180,8 @@ class TypingGame:
         pygame.display.flip()
         pygame.time.wait(3000)
 
-        pygame.quit()
-
+        return "Game_main_screen"
 # Create an instance of class `TypingGame` and call the `run` method
 if __name__ == "__main__":
-    game_instance = TypingGame()
+    game_instance = Game3_Play()
     game_instance.run()

@@ -2,8 +2,18 @@ import pygame
 import random
 import time
 import os
+from Parent import *
 
-class BombDefusalGame:
+current_dir = os.path.dirname(__file__)
+
+
+class Game2_Screen(Screen):
+    def draw(self):
+        self.screen.fill(WHITE)
+        draw_text('Start Setting', font, BLACK, self.screen, 400, 300)
+        pygame.display.update()
+
+class Game2_Play:
     def __init__(self):
         # Initialize pygame
         pygame.init()
@@ -49,16 +59,18 @@ class BombDefusalGame:
         pygame.display.set_caption("Bomb Defusal Game")
 
         # Load background image
-        os.chdir('/Users/hyeonjuyeon/Desktop/2024-OOP-Project/2024-OOP-project/Game/2')
-        self.background = pygame.image.load('Game2_background2.png')
+        Game2_back_dir = os.path.join(current_dir,'data','Game2_background2.png')
+        self.background = pygame.image.load(Game2_back_dir)
         self.background = pygame.transform.scale(self.background, (self.WIDTH, self.HEIGHT))
 
         # Load player image
-        self.player_image = pygame.image.load('Game2_player.png')  # Replace 'player.png' with your image file
+        Game2_player_dir = os.path.join(current_dir,'data','Game2_player.png')
+        self.player_image = pygame.image.load(Game2_player_dir)  # Replace 'player.png' with your image file
         self.player_image = pygame.transform.scale(self.player_image, (self.CIRCLE_RADIUS * 2, self.CIRCLE_RADIUS * 2))
 
         # Load bomb image
-        self.bomb_image = pygame.image.load('Game2_bomb.png')  # Replace 'bomb.png' with your image file
+        Game2_bomb_dir = os.path.join(current_dir,'data','Game2_bomb.png')
+        self.bomb_image = pygame.image.load(Game2_bomb_dir)  # Replace 'bomb.png' with your image file
         self.bomb_image = pygame.transform.scale(self.bomb_image, (self.CIRCLE_RADIUS * 2.1, self.CIRCLE_RADIUS * 2.1))
 
         # Player starting position
@@ -174,12 +186,13 @@ class BombDefusalGame:
         self.screen.blit(game_over_surface, (self.WIDTH // 2 - game_over_surface.get_width() // 2, self.HEIGHT // 2 - game_over_surface.get_height() // 2))
         pygame.display.flip()
         pygame.time.wait(2000)
-        pygame.quit()
+        
 
     def run(self):
         self.main()
+        return "Game_main_screen"
 
 # Create an instance of class `BombDefusalGame` and call the `run` method
 if __name__ == "__main__":
-    game_instance = BombDefusalGame()
+    game_instance = Game2_Play()
     game_instance.run()
