@@ -78,7 +78,7 @@ story = [
 sound_dir = os.path.join(current_dir,'data','MainSound.wav')
 pygame.mixer.init()
 pygame.mixer.music.load(sound_dir)
-pygame.mixer.music.set_volume(0.5)  # 음량 설정 (0.0 ~ 1.0)
+pygame.mixer.music.set_volume(1.0)  # 음량 설정 (0.0 ~ 1.0)
 
 
 
